@@ -26,6 +26,7 @@ struct HomeView: View {
                             
                             VStack(spacing: 20) {
                                 
+                                // Learn Card
                                 NavigationLink(
                                     destination: ContentView()
                                         .onAppear(perform: {
@@ -38,7 +39,22 @@ struct HomeView: View {
                                     })
                                 
                                 // Test Card
-                                HomeViewRow(image: module.test.image, title: "\(module.category) Test", description: module.test.description, count: "\(module.test.questions.count) Questions", time: module.test.time)
+                                NavigationLink(
+                                    destination: TestView()
+                                        .onAppear(perform: {
+                                            model.beginTest(module.id)
+                                        }),
+                                    tag: module.id,
+                                    selection: $model.currentTestSelected,
+                                    label: {
+                                        HomeViewRow(image: module.test.image, title: "\(module.category) Test", description: module.test.description, count: "\(module.test.questions.count) Questions", time: module.test.time)
+                                    })
+                                
+                                NavigationLink(
+                                    destination: EmptyView(),
+                                    label: {
+                                        EmptyView()
+                                    })
                             }
                         }
                         
