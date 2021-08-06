@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		2B59B49926BC7A880059C0CF /* CodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B59B49826BC7A880059C0CF /* CodeTextView.swift */; };
+		2B59B4BA26BDAC760059C0CF /* RectangleCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B59B4B926BDAC760059C0CF /* RectangleCard.swift */; };
 		2B740F0D26B9F5F700F15CCC /* LearningApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B740F0C26B9F5F700F15CCC /* LearningApp.swift */; };
 		2B740F0F26B9F5F700F15CCC /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B740F0E26B9F5F700F15CCC /* HomeView.swift */; };
 		2B740F1126B9F5F700F15CCC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2B740F1026B9F5F700F15CCC /* Assets.xcassets */; };
@@ -26,6 +27,7 @@
 
 /* Begin PBXFileReference section */
 		2B59B49826BC7A880059C0CF /* CodeTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTextView.swift; sourceTree = "<group>"; };
+		2B59B4B926BDAC760059C0CF /* RectangleCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RectangleCard.swift; sourceTree = "<group>"; };
 		2B740F0926B9F5F700F15CCC /* LearningApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LearningApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2B740F0C26B9F5F700F15CCC /* LearningApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearningApp.swift; sourceTree = "<group>"; };
 		2B740F0E26B9F5F700F15CCC /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -106,6 +108,7 @@
 				2B740F2C26BB568000F15CCC /* ContentViewRow.swift */,
 				2B740F2E26BC4E7B00F15CCC /* ContentDetailView.swift */,
 				2B59B49826BC7A880059C0CF /* CodeTextView.swift */,
+				2B59B4B926BDAC760059C0CF /* RectangleCard.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -231,6 +234,7 @@
 				2B59B49926BC7A880059C0CF /* CodeTextView.swift in Sources */,
 				2B740F2126B9F6C800F15CCC /* ContentModel.swift in Sources */,
 				2B740F2726B9FD7300F15CCC /* Models.swift in Sources */,
+				2B59B4BA26BDAC760059C0CF /* RectangleCard.swift in Sources */,
 				2B740F3426BC51C000F15CCC /* Constants.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
