@@ -87,18 +87,32 @@ struct TestView: View {
                 
                 Button(action: {
                     
-                    // Change submitted state to true
-                    submitted = true
-                    // check correct answer
-                    if selectedAnswerIndex == model.currentQuestion!.correctIndex {
-                        numCorrect += 1
+                    // Check if answer has been submitted
+                    if submitted {
+                        
+                        //Answer has already been submitted, move to next question
+                        model.nextQuestion()
+                        
+                        // Reset properties
+                        submitted = false
+                        selectedAnswerIndex = nil
+                        
+                    } else {
+                        
+                        // Change submitted state to true
+                        submitted = true
+                        // check correct answer
+                        if selectedAnswerIndex == model.currentQuestion!.correctIndex {
+                            numCorrect += 1
+                        }
                     }
+                    
                 }, label: {
                     ZStack {
                         RectangleCard(color: .green)
                             .frame(height: 48)
                         
-                        Text("Submit")
+                        Text(buttonText)
                             .foregroundColor(.white)
                             .bold()
                     }
@@ -112,6 +126,20 @@ struct TestView: View {
             
             // Test hasn't loaded yet
             ProgressView() // spinning circle
+        }
+    }
+    
+    var buttonText: String {
+        
+        // Check if answer has been subimtted
+        if submitted {
+            if model.currentQuestionIndex + 1 == model.currentModule!.test.questions.count {
+                return "Finish"
+            } else {
+                return "Next"
+            }
+        } else {
+            return "Submit"
         }
     }
 }
