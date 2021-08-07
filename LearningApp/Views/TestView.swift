@@ -13,10 +13,11 @@ struct TestView: View {
     @State var selectedAnswerIndex: Int?
     @State var numCorrect = 0
     @State var submitted = false
+    @State var showResult = false
     
     var body: some View {
         
-        if model.currentQuestion != nil {
+        if model.currentQuestion != nil && showResult == false {
             
             VStack(alignment: .leading) {
                 
@@ -38,7 +39,7 @@ struct TestView: View {
                                 selectedAnswerIndex = index
                             }, label: {
                                 
-                                // checking cases for each button's color
+                                // setting each button's color
                                 ZStack {
                                     if submitted == false {
                                         RectangleCard(color: index == selectedAnswerIndex ? .gray : .white)
@@ -90,13 +91,18 @@ struct TestView: View {
                     // Check if answer has been submitted
                     if submitted {
                         
-                        //Answer has already been submitted, move to next question
-                        model.nextQuestion()
-                        
-                        // Reset properties
-                        submitted = false
-                        selectedAnswerIndex = nil
-                        
+                        // Check if the last question
+                        if model.currentQuestionIndex + 1 == model.currentModule!.test.questions.count {
+                            showResult = true
+                        } else {
+                            // Not the last question
+                            //Answer has already been submitted, move to next question
+                            model.nextQuestion()
+                            
+                            // Reset properties
+                            submitted = false
+                            selectedAnswerIndex = nil
+                        }
                     } else {
                         
                         // Change submitted state to true
@@ -122,8 +128,12 @@ struct TestView: View {
             }
             .navigationBarTitle("\(model.currentModule?.category ?? "") Test")
             
-        } else {
+        } else if showResult {
             
+            // if currentQuestion = nil, show the result view
+            TestResultView(numCorrect: numCorrect)
+        }
+        else {
             // Test hasn't loaded yet
             ProgressView() // spinning circle
         }
