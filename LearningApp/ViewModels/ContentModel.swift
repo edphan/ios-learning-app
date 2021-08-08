@@ -34,7 +34,13 @@ class ContentModel: ObservableObject {
     var styleData: Data?
     
     init() {
+        
+        // Parse the included json data
         getLocalData()
+        
+        // download the remote json file and parse data
+        getRemoteData()
+        
     }
     
     // MARK: - data method
@@ -81,6 +87,57 @@ class ContentModel: ObservableObject {
         } catch {
             print("Couldnt parse style data")
         }
+        
+    }
+    
+    func getRemoteData() {
+        
+        // String path
+        let urlString = "https://edphan.github.io/learningapp-data/data2.json"
+        
+        // Create a url object
+        let url = URL(string: urlString)
+        
+        guard url != nil else {
+            // couldn't create url
+            return
+        }
+        
+        // create a URLRequest Object
+        let request = URLRequest(url: url!)
+        
+        // Get the session and kick off the task
+        let session = URLSession.shared
+        
+        let dataTask = session.dataTask(with: request) { data, response, error in
+            
+            // Check if there is an error
+            guard error == nil else {
+                // There was an error
+                return
+            }
+            
+            // Handle the response
+            // Create JSONDecoder
+            let decoder = JSONDecoder()
+            
+            // Decode
+            
+            do {
+                let modules = try decoder.decode([Module].self, from: data!)
+                
+                // Append parsed modules to modules array
+                self.modules += modules
+                
+            } catch {
+                print(error)
+            }
+            
+            
+        }
+        
+        // Kick off dataTask
+        dataTask.resume()
         
     }
     
