@@ -12,9 +12,15 @@ struct ContentViewRow: View {
     @EnvironmentObject var model: ContentModel
     var index: Int
     
+        var lesson: Lesson {
+            if model.currentModule != nil && index < model.currentModule!.content.lessons.count {
+                return model.currentModule!.content.lessons[index]
+            } else {
+                return Lesson(id: "", title: "", video: "", duration: "", explanation: "")
+            }
+        }
+    
     var body: some View {
-        
-        let lesson = model.currentModule!.content.lessons[index]
         
         // Lesson card
         ZStack(alignment: .leading) {
