@@ -7,232 +7,289 @@
 
 import Foundation
 import Firebase
+import FirebaseAuth
 
 class ContentModel: ObservableObject {
     
+    // Authentication
+    @Published var loggedIn = false
+    
+    // Reference to Cloud Firestore database
     let db = Firestore.firestore()
     
     // List of modules
     @Published var modules = [Module]()
     
-    // Current Model
+    // Current module
     @Published var currentModule: Module?
     var currentModuleIndex = 0
     
-    // Current Lesson
+    // Current lesson
     @Published var currentLesson: Lesson?
     var currentLessonIndex = 0
     
-    // Current Question
+    // Current question
     @Published var currentQuestion: Question?
     var currentQuestionIndex = 0
-   
+    
     // Current lesson explanation
     @Published var codeText = NSAttributedString()
-    
-    // Current selected content and test
-    @Published var currentContentSelected: Int?
-    @Published var currentTestSelected: Int?
-    
     var styleData: Data?
     
+    // Current selected content and test
+    @Published var currentContentSelected:Int?
+    @Published var currentTestSelected:Int?
+    
+    
     init() {
-        
-        // Parse the local style.html
-        getLocalStyle()
-        
-        // download the remote json file and parse data
-        // getRemoteData()
-        
-        // Get database modules
-        getModules()
-        
     }
     
-    // MARK: - data method
+    // MARK: - Authentication methods
+    
+    func checkLogin() {
+        
+        // Check if there's a current user to determine logged in status
+        loggedIn = Auth.auth().currentUser != nil ? true : false
+        
+        // Check if user meta data has been fetched. If the user was already logged in from a previous sesson, we need to get their data in a separate call
+        if UserService.shared.user.name == "" {
+            getUserData()
+        }
+        
+        // Check if user meta data has been fetched. If the user was already logged in from a previous session, we need to get their data in a separate call
+        if UserService.shared.user.name == "" {
+            getUserData()
+        }
+    }
+    
+    // MARK: - Data methods
+    
+    func saveData(_ writeToDatabase: Bool = false) {
+        
+        if let loggedInUser = Auth.auth().currentUser {
+            // Save the progress data locally
+           let user = UserService.shared.user
+           user.lastModule = currentModuleIndex
+           user.lastLesson = currentLessonIndex
+           user.lastQuestion = currentQuestionIndex
+           
+            if writeToDatabase {
+                // Save it to the db
+                let db = Firestore.firestore()
+                 let ref = db.collection("users").document(loggedInUser.uid)
+                 ref.setData(["lastModule": user.lastModule ?? NSNull(),
+                              "lastLesson": user.lastLesson ?? NSNull(),
+                              "lastQuestion": user.lastQuestion ?? NSNull()], merge: true)
+            }
+           
+        }
+        
+         
+    }
+    
+    func getUserData() {
+        
+        // Check that there's a logged in user
+        guard Auth.auth().currentUser != nil else {
+            return
+        }
+        
+        // Get the meta data for that user
+        let db = Firestore.firestore()
+        let ref = db.collection("users").document(Auth.auth().currentUser!.uid)
+        ref.getDocument { snapshot, error in
+            
+            // Check there's no errors
+            guard error == nil, snapshot != nil else {
+                return
+            }
+            
+            // Parse the data out and set the user meta data
+            let data = snapshot!.data()
+            let user = UserService.shared.user
+            user.name = data?["name"] as? String ?? ""
+            user.lastModule = data?["lastModule"] as? Int
+            user.lastLesson = data?["lastLesson"] as? Int
+            user.lastQuestion = data?["lastQuestion"] as? Int
+        }
+    }
+    
+    func getDatabaseData() {
+        
+        // Parse local included json data
+        getLocalStyleData()
+        
+        // Get a reference to the modules collection
+        let collection = db.collection("modules")
+        
+        // Get the documents for the collection
+        collection.getDocuments { snapshot, error in
+            if error == nil {
+                
+                // Declare temp module list
+                var modules = [Module]()
+                
+                for doc in snapshot!.documents {
+                    
+                    var m = Module(id: doc["id"] as? String ?? "",
+                                   category: doc["category"] as? String ?? ""
+                                   )
+                    m.content.id = doc["id"] as? String ?? ""
+                    
+                    // Content properties
+                    let c = doc["content"] as! [String: Any]
+                    
+                    m.content.image = c["image"] as? String ?? ""
+                    m.content.time = c["time"] as? String ?? ""
+                    m.content.description = c["description"] as? String ?? ""
+                    
+                    // Test properties
+                    let t = doc["test"] as! [String:Any]
+                    
+                    m.test.image = t["image"] as? String ?? ""
+                    m.test.time = t["time"] as? String ?? ""
+                    m.test.description = t["description"] as? String ?? ""
+                    
+                    modules.append(m)
+                }
+                
+                DispatchQueue.main.async {
+                    self.modules = modules
+                }
+            }
+        }
+        
+    }
     
     func getLessons(module: Module, completion: @escaping () -> Void) {
         
-        // Specify path
+        // Get a reference to the collection for lessons
         let collection = db.collection("modules").document(module.id).collection("lessons")
         
-        // Get documents
-        collection.getDocuments { (snapshot, error) in
-            if error == nil && snapshot != nil {
+        // Get the documents from the collection
+        collection.getDocuments { snapshot, error in
+            if error == nil {
                 
-                // Array to track lessons
                 var lessons = [Lesson]()
                 
-                // Loop through the snapshot documents array and build the array of lessons
                 for doc in snapshot!.documents {
                     
-                    var l = Lesson()
+                    var q = Lesson()
+                    //q.id = doc["id"] as? String ?? ""
+                    q.duration = doc["duration"] as? String ?? ""
+                    q.explanation = doc["explanation"] as? String ?? ""
+                    q.title = doc["title"] as? String ?? ""
+                    q.video = doc["video"] as? String ?? ""
                     
-                    l.id = doc["id"] as? String ?? UUID().uuidString
-                    l.title = doc["title"] as? String ?? ""
-                    l.video = doc["video"] as? String ?? ""
-                    l.duration = doc["duration"] as? String ?? ""
-                    l.explanation = doc["explanation"] as? String ?? ""
-                    
-                    // Add the lessons to the array
-                    lessons.append(l)
+                    lessons.append(q)
                 }
                 
-                // Setting the lessons to the module
-                // Loop through the published modules array and find the one module that matches the id of the one that got passed in
                 for (index, m) in self.modules.enumerated() {
                     
-                    // Find the module we want
-                    if m.id == module.id {
-                        
-                        // set the lesson
-                        self.modules[index].content.lessons = lessons
-                        
-                        // Call the completion closure
-                        completion()
+                if module.id == m.id {
+                        DispatchQueue.main.async {
+                            self.modules[index].content.lessons = lessons
+                           // self.currentModule?.content.lessons = lessons
+                            completion()
+                        }
+                        break
                     }
+                    
                 }
+                
+                
             }
+            
         }
     }
     
-    func getQuestions(module: Module, completion: @escaping () -> Void) {
-        
-        // Specify path
+    func getQuestions(module: Module, completion: @escaping ()-> Void) {
+        // Get a reference to the collection for questions
         let collection = db.collection("modules").document(module.id).collection("questions")
         
-        // Get documents
-        collection.getDocuments { (snapshot, error) in
-            if error == nil && snapshot != nil {
+        // Get the documents for the collection
+        collection.getDocuments { snapshot, error in
+            if error == nil {
                 
-                // Array to track lessons
                 var questions = [Question]()
                 
-                // Loop through the snapshot documents array and build the array of lessons
                 for doc in snapshot!.documents {
                     
                     var q = Question()
-                    
-                    q.id = doc["id"] as? String ?? UUID().uuidString
-                    q.content = doc["content"] as? String ?? ""
+                    //q.id = doc["id"] as? String ?? ""
                     q.correctIndex = doc["correctIndex"] as? Int ?? 0
+                    q.content = doc["content"] as? String ?? ""
                     q.answers = doc["answers"] as? [String] ?? [String]()
                     
-                    // Add the lessons to the array
                     questions.append(q)
                 }
                 
-                // Setting the lessons to the module
-                // Loop through the published modules array and find the one module that matches the id of the one that got passed in
                 for (index, m) in self.modules.enumerated() {
                     
-                    // Find the module we want
-                    if m.id == module.id {
-                        
-                        // set the lesson
+                if module.id == m.id {
+                        DispatchQueue.main.async {
+                            self.modules[index].test.questions = questions
+                           // self.currentModule?.content.lessons = lessons
+                            completion()
+                        }
+                        break
+                    }
+                    
+                }
+                
+                
+            }
+            
+        }
+    }
+    
+    func updateModule<Element>(module: Module?, data: [Element]) {
+        
+        // Check that a module was given
+        guard module != nil else {
+            print("No module provided for child data.")
+            return
+        }
+        
+        // Find the module we want to update
+        for (index, mod) in self.modules.enumerated() {
+            
+            if module!.id == mod.id {
+                
+                // We found the module, update the UI
+                DispatchQueue.main.async {
+                    
+                    if let questions = data as? [Question] {
                         self.modules[index].test.questions = questions
                         
-                        // Call the completion closure
-                        completion()
+                    } else if let lessons = data as? [Lesson] {
+                        self.modules[index].content.lessons = lessons
+                        
                     }
                 }
+                
+                break
             }
         }
     }
     
-    func getModules() {
+    func getLocalStyleData() {
         
-        // Specify path
-        let collection = db.collection("modules")
         
-        // Get document
-        collection.getDocuments { (snapshot, error) in
-            if error == nil && snapshot != nil {
-                
-                // Create an array for the modules
-                var modulesArray = [Module]()
-                
-                // Loop through the returned document
-                for doc in snapshot!.documents {
-                    
-                    // Create a new module instance
-                    var m = Module()
-                    
-                    // Parse out the value from the document into the module instance
-                    m.id = doc["id"] as? String ?? UUID().uuidString
-                    m.category = doc["category"] as? String ?? ""
-                    
-                    // Parse the lesson content
-                    let contentMap = doc["content"] as! [String: Any]
-                    
-                    m.content.id = contentMap["id"] as? String ?? ""
-                    m.content.description = contentMap["description"] as? String ?? ""
-                    m.content.image = contentMap["image"] as? String ?? ""
-                    m.content.time = contentMap["time"] as? String ?? ""
-                    
-                    // Parse the test content
-                    let testMap = doc["test"] as! [String: Any]
-                    
-                    m.test.id = testMap["id"] as? String ?? ""
-                    m.test.description = testMap["description"] as? String ?? ""
-                    m.test.image = testMap["image"] as? String ?? ""
-                    m.test.time = testMap["time"] as? String ?? ""
-                    
-                    // Add to array
-                    modulesArray.append(m)
-                }
-                
-                // Assign the modules to the published property
-                DispatchQueue.main.async {
-                    self.modules = modulesArray
-                }
-            }
-        }
-    }
-    
-    func getLocalStyle() {
-        /*
-        // Get URL to JSON file
-        let jsonURL = Bundle.main.url(forResource: "data", withExtension: "json")
-        
-        // Read the file into data object
-        do {
-            
-            let jsonData = try Data(contentsOf: jsonURL!)
-            
-            let jsonDecoder = JSONDecoder()
-            
-            do {
-                
-                let parsedModules = try jsonDecoder.decode([Module].self, from: jsonData)
-                
-                // Assign parsed modules to modules property
-                self.modules = parsedModules
-                
-            } catch {
-                // prints error when trying to decode
-                print(error)
-            }
-            
-        } catch {
-            // prints error when trying to read file into data object
-            print(error)
-        }
-        */
         
         // Parse the style data
-        let styleURL = Bundle.main.url(forResource: "style", withExtension: "html")
+        let styleUrl = Bundle.main.url(forResource: "style", withExtension: "html")
         
-        // Read the file into data object
         do {
             
-            // Read the file into data object
-            let styleData = try Data(contentsOf: styleURL!)
+            // Read the file into a data object
+            let styleData = try Data(contentsOf: styleUrl!)
             
             self.styleData = styleData
-            
-        } catch {
-            print("Couldnt parse style data")
+        }
+        catch {
+            // Log error
+            print("Couldn't parse style data")
         }
         
     }
@@ -240,64 +297,63 @@ class ContentModel: ObservableObject {
     func getRemoteData() {
         
         // String path
-        let urlString = "https://edphan.github.io/learningapp-data/data2.json"
+        let urlString = "https://codewithchris.github.io/learningapp-data/data2.json"
         
         // Create a url object
         let url = URL(string: urlString)
         
         guard url != nil else {
-            // couldn't create url
+            // Couldn't create url
             return
         }
         
-        // create a URLRequest Object
+        // Create a URLRequest object
         let request = URLRequest(url: url!)
         
         // Get the session and kick off the task
         let session = URLSession.shared
         
-        let dataTask = session.dataTask(with: request) { data, response, error in
+        let dataTask = session.dataTask(with: request) { (data, response, error) in
             
-            // Check if there is an error
+            // Check if there's an error
             guard error == nil else {
                 // There was an error
                 return
             }
             
-            // Handle the response
-            // Create JSONDecoder
-            let decoder = JSONDecoder()
-            
-            // Decode
-            
             do {
+                // Create json decoder
+                let decoder = JSONDecoder()
+            
+                // Decode
                 let modules = try decoder.decode([Module].self, from: data!)
                 
-                // When possible, assign to the main thread, leaving background thread free to update UI
                 DispatchQueue.main.async {
-                    // Append parsed modules to modules array
+                    
+                    // Append parsed modules into modules property
                     self.modules += modules
                 }
                 
-            } catch {
-                print(error)
             }
-            
-            
+            catch {
+                // Couldn't parse json
+            }
         }
         
-        // Kick off dataTask
+        // Kick off data task
         dataTask.resume()
         
     }
     
-    // MARK: - Module navigation method
+    // MARK: - Module navigation methods
     
-    func beginModule(_ moduleId: String) {
+    func beginModule(_ moduleid:String) {
         
-        // Find the index of module id
+        // Find the index for this module id
         for index in 0..<modules.count {
-            if modules[index].id == moduleId {
+            
+            if modules[index].id == moduleid {
+            
                 // Found the matching module
                 currentModuleIndex = index
                 break
@@ -308,12 +364,16 @@ class ContentModel: ObservableObject {
         currentModule = modules[currentModuleIndex]
     }
     
-    func beginLesson(_ lessonIndex: Int) {
+    func beginLesson(_ lessonIndex:Int) {
         
-        // Check the lesson index is within range of module's lessons
+        // Reset the question index
+        currentQuestionIndex = 0
+        
+        // Check that the lesson index is within range of module lessons
         if lessonIndex < currentModule!.content.lessons.count {
             currentLessonIndex = lessonIndex
-        } else {
+        }
+        else {
             currentLessonIndex = 0
         }
         
@@ -324,22 +384,24 @@ class ContentModel: ObservableObject {
     
     func nextLesson() {
         
-        // Advance to the next lesson index
+        // Advance the lesson index
         currentLessonIndex += 1
         
-        // Check if within range
+        // Check that it is within range
         if currentLessonIndex < currentModule!.content.lessons.count {
             
             // Set the current lesson property
             currentLesson = currentModule!.content.lessons[currentLessonIndex]
             codeText = addStyling(currentLesson!.explanation)
-            
-        } else {
-            
+        }
+        else {
             // Reset the lesson state
             currentLessonIndex = 0
             currentLesson = nil
         }
+        
+        // Save the progress
+        saveData()
     }
     
     func hasNextLesson() -> Bool {
@@ -348,47 +410,53 @@ class ContentModel: ObservableObject {
             return false
         }
         
-        return currentLessonIndex + 1 < currentModule!.content.lessons.count
+        return (currentLessonIndex + 1 < currentModule!.content.lessons.count)
     }
     
-    func beginTest(_ moduleId: String) {
+    func beginTest(_ moduleId:String) {
         
         // Set the current module
         beginModule(moduleId)
         
-        // Set the current question
+        // Set the current question index
         currentQuestionIndex = 0
         
-        // If there are questions, set the current question to the first question
-        if currentModule?.test.questions.count ?? 0 > 0 {
+        // Reset the lesson index
+        currentLessonIndex = 0
+        
+        // If there are questions, set the current question to the first one
+        if currentModule?.test.questions.count ?? 0  > 0 {
             currentQuestion = currentModule!.test.questions[currentQuestionIndex]
             
-            // set the question content
+            // Set the question content
             codeText = addStyling(currentQuestion!.content)
         }
     }
     
     func nextQuestion() {
         
-        // Advance to the next question index
+        // Advance the question index
         currentQuestionIndex += 1
         
-        // Check if within range
+        // Check that it's within the range of questions
         if currentQuestionIndex < currentModule!.test.questions.count {
             
-            // Set the current question property
+            // Set the current question
             currentQuestion = currentModule!.test.questions[currentQuestionIndex]
             codeText = addStyling(currentQuestion!.content)
-            
-        } else {
-            
-            // Reset the lesson state
+        }
+        else {
+            // If not, then reset the properties
             currentQuestionIndex = 0
             currentQuestion = nil
         }
+        
+        saveData()
+        
     }
     
     // MARK: - Code Styling
+    
     private func addStyling(_ htmlString: String) -> NSAttributedString {
         
         var resultString = NSAttributedString()
@@ -396,15 +464,15 @@ class ContentModel: ObservableObject {
         
         // Add the styling data
         if styleData != nil {
-            data.append(self.styleData!)
+            data.append(styleData!)
         }
         
         // Add the html data
         data.append(Data(htmlString.utf8))
         
         // Convert to attributed string
-        // if an error is thrown, the code inside the {} wont execute, it just skips the code in {}
         if let attributedString = try? NSAttributedString(data: data, options: [.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil) {
+            
             resultString = attributedString
         }
         

@@ -10,4 +10,9 @@ import Foundation
 struct Constants {
     
     static var videoHostUrl = "https://codewithchris.github.io/learningJSON/"
+    
+    enum loginMode {
+        case login
+        case createAccount
+    }
 }

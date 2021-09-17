@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		086689DB13EE6106E19635A1 /* Pods_LearningApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3090AB3856FC5350B90DA0F7 /* Pods_LearningApp.framework */; };
+		2B25196E26F2D46900D27F26 /* UserService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B25196D26F2D46900D27F26 /* UserService.swift */; };
 		2B2AB43E26BDF8BB00FA02FE /* TestView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2AB43D26BDF8BB00FA02FE /* TestView.swift */; };
 		2B2AB44026BE31C500FA02FE /* TestResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B2AB43F26BE31C500FA02FE /* TestResultView.swift */; };
 		2B59B49926BC7A880059C0CF /* CodeTextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B59B49826BC7A880059C0CF /* CodeTextView.swift */; };
@@ -27,9 +28,14 @@
 		2B740F3226BC509B00F15CCC /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 2B740F3126BC509B00F15CCC /* AVKit.framework */; };
 		2B740F3426BC51C000F15CCC /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2B740F3326BC51C000F15CCC /* Constants.swift */; };
 		2B7FCD3D26E13E4C00A7083E /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2B7FCD3C26E13E4C00A7083E /* GoogleService-Info.plist */; };
+		2BE62DC226F181D3002DB10F /* LaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE62DC126F181D3002DB10F /* LaunchView.swift */; };
+		2BE62DCA26F182D4002DB10F /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE62DC926F182D4002DB10F /* LoginView.swift */; };
+		2BE62DCC26F182FD002DB10F /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BE62DCB26F182FD002DB10F /* ProfileView.swift */; };
+		2BFD820C26F422E000E8E1E9 /* ResumeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BFD820B26F422E000E8E1E9 /* ResumeView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		2B25196D26F2D46900D27F26 /* UserService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserService.swift; sourceTree = "<group>"; };
 		2B2AB43D26BDF8BB00FA02FE /* TestView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestView.swift; sourceTree = "<group>"; };
 		2B2AB43F26BE31C500FA02FE /* TestResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestResultView.swift; sourceTree = "<group>"; };
 		2B59B49826BC7A880059C0CF /* CodeTextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodeTextView.swift; sourceTree = "<group>"; };
@@ -51,6 +57,10 @@
 		2B740F3126BC509B00F15CCC /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		2B740F3326BC51C000F15CCC /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		2B7FCD3C26E13E4C00A7083E /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		2BE62DC126F181D3002DB10F /* LaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchView.swift; sourceTree = "<group>"; };
+		2BE62DC926F182D4002DB10F /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		2BE62DCB26F182FD002DB10F /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		2BFD820B26F422E000E8E1E9 /* ResumeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResumeView.swift; sourceTree = "<group>"; };
 		3090AB3856FC5350B90DA0F7 /* Pods_LearningApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LearningApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		65568DA87A1F6E50C8279267 /* Pods-LearningApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LearningApp.debug.xcconfig"; path = "Target Support Files/Pods-LearningApp/Pods-LearningApp.debug.xcconfig"; sourceTree = "<group>"; };
 		680DDC17E09F5345675C4115 /* Pods-LearningApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LearningApp.release.xcconfig"; path = "Target Support Files/Pods-LearningApp/Pods-LearningApp.release.xcconfig"; sourceTree = "<group>"; };
@@ -115,15 +125,12 @@
 		2B740F1B26B9F66800F15CCC /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				2B740F0E26B9F5F700F15CCC /* HomeView.swift */,
-				2B740F2826BA2F3400F15CCC /* HomeViewRow.swift */,
-				2B740F2A26BAF78B00F15CCC /* ContentView.swift */,
-				2B740F2C26BB568000F15CCC /* ContentViewRow.swift */,
-				2B740F2E26BC4E7B00F15CCC /* ContentDetailView.swift */,
-				2B2AB43D26BDF8BB00FA02FE /* TestView.swift */,
-				2B2AB43F26BE31C500FA02FE /* TestResultView.swift */,
-				2B59B49826BC7A880059C0CF /* CodeTextView.swift */,
-				2B59B4B926BDAC760059C0CF /* RectangleCard.swift */,
+				2BE62DC126F181D3002DB10F /* LaunchView.swift */,
+				2BE62DC826F182A0002DB10F /* Common */,
+				2BE62DC726F1829B002DB10F /* Home */,
+				2BE62DC526F181F1002DB10F /* Test */,
+				2BE62DC426F181E4002DB10F /* Lesson */,
+				2BE62DC326F181D9002DB10F /* Account */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -149,7 +156,6 @@
 			children = (
 				2B740F2326B9F8D500F15CCC /* data.json */,
 				2B740F2226B9F8D500F15CCC /* style.html */,
-				2B740F3326BC51C000F15CCC /* Constants.swift */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -157,6 +163,8 @@
 		2B740F1F26B9F68100F15CCC /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				2B740F3326BC51C000F15CCC /* Constants.swift */,
+				2B25196D26F2D46900D27F26 /* UserService.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -168,6 +176,53 @@
 				3090AB3856FC5350B90DA0F7 /* Pods_LearningApp.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2BE62DC326F181D9002DB10F /* Account */ = {
+			isa = PBXGroup;
+			children = (
+				2BE62DC926F182D4002DB10F /* LoginView.swift */,
+				2BE62DCB26F182FD002DB10F /* ProfileView.swift */,
+			);
+			path = Account;
+			sourceTree = "<group>";
+		};
+		2BE62DC426F181E4002DB10F /* Lesson */ = {
+			isa = PBXGroup;
+			children = (
+				2B740F2A26BAF78B00F15CCC /* ContentView.swift */,
+				2B740F2C26BB568000F15CCC /* ContentViewRow.swift */,
+				2B740F2E26BC4E7B00F15CCC /* ContentDetailView.swift */,
+			);
+			path = Lesson;
+			sourceTree = "<group>";
+		};
+		2BE62DC526F181F1002DB10F /* Test */ = {
+			isa = PBXGroup;
+			children = (
+				2B2AB43D26BDF8BB00FA02FE /* TestView.swift */,
+				2B2AB43F26BE31C500FA02FE /* TestResultView.swift */,
+			);
+			path = Test;
+			sourceTree = "<group>";
+		};
+		2BE62DC726F1829B002DB10F /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				2B740F0E26B9F5F700F15CCC /* HomeView.swift */,
+				2B740F2826BA2F3400F15CCC /* HomeViewRow.swift */,
+				2BFD820B26F422E000E8E1E9 /* ResumeView.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		2BE62DC826F182A0002DB10F /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				2B59B49826BC7A880059C0CF /* CodeTextView.swift */,
+				2B59B4B926BDAC760059C0CF /* RectangleCard.swift */,
+			);
+			path = Common;
 			sourceTree = "<group>";
 		};
 		7B3D4866CB5930D4D246BA63 /* Pods */ = {
@@ -298,10 +353,15 @@
 				2B2AB43E26BDF8BB00FA02FE /* TestView.swift in Sources */,
 				2B2AB44026BE31C500FA02FE /* TestResultView.swift in Sources */,
 				2B740F0F26B9F5F700F15CCC /* HomeView.swift in Sources */,
+				2BE62DCA26F182D4002DB10F /* LoginView.swift in Sources */,
+				2BE62DC226F181D3002DB10F /* LaunchView.swift in Sources */,
 				2B740F2926BA2F3400F15CCC /* HomeViewRow.swift in Sources */,
+				2B25196E26F2D46900D27F26 /* UserService.swift in Sources */,
 				2B740F2B26BAF78B00F15CCC /* ContentView.swift in Sources */,
 				2B740F2F26BC4E7B00F15CCC /* ContentDetailView.swift in Sources */,
+				2BE62DCC26F182FD002DB10F /* ProfileView.swift in Sources */,
 				2B740F0D26B9F5F700F15CCC /* LearningApp.swift in Sources */,
+				2BFD820C26F422E000E8E1E9 /* ResumeView.swift in Sources */,
 				2B740F2D26BB568000F15CCC /* ContentViewRow.swift in Sources */,
 				2B59B49926BC7A880059C0CF /* CodeTextView.swift in Sources */,
 				2B740F2126B9F6C800F15CCC /* ContentModel.swift in Sources */,
